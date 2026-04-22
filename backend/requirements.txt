@@ -1,0 +1,50 @@
+fastapi==0.110.0
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.13.1
+pydantic==2.6.1
+email-validator==2.1.1
+python-jose[cryptography]==3.3.0
+python-multipart==0.0.20
+passlib[bcrypt]==1.7.4
+cloud-sql-python-connector==1.4.3
+google-cloud-storage==2.13.0
+google-auth==2.25.2
+langchain==0.1.20
+langchain-community==0.0.38
+openai==1.6.1
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+python-docx==1.1.0
+google-cloud-translate==3.14.0
+google-cloud-aiplatform==1.71.1
+google-genai==0.1.0
+google-generativeai==0.8.3
+vertexai==1.71.1
+google-cloud-dlp==3.14.0
+
+# Content processing dependencies
+beautifulsoup4==4.12.3
+PyPDF2==3.0.1
+youtube-transcript-api==0.6.2
+aiohttp==3.9.5
+requests==2.32.3
+numpy==1.26.4
+tiktoken==0.7.0
+playwright==1.41.0
+readability-lxml==0.8.1
+lxml-html-clean==0.4.1
+
+# YouTube audio extraction and transcription
+yt-dlp==2024.8.6
+google-cloud-speech==2.26.0
+ffmpeg-python==0.2.0
+
+# Apify for YouTube transcript extraction
+apify-client==1.9.4
+
+# Source discovery module
+anthropic>=0.40.0
+trafilatura>=1.8.0

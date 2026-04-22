@@ -1,0 +1,10 @@
+@import 'tailwindcss' source(none);
+@source '../**/*.{js,ts,jsx,tsx}';
+
+@import 'tw-animate-css';
+
+@media print {
+  nav, header, .sticky { display: none !important; }
+  body { background: white !important; }
+  .shadow-xl, .shadow-md { box-shadow: none !important; }
+}
