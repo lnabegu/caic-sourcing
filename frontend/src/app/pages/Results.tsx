@@ -5,8 +5,8 @@ import { Card } from '../components/ui/card';
 import { Slider } from '../components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-import { ThumbsUp, ThumbsDown, FileText, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { ThumbsUp, ThumbsDown, FileText, Loader2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { pipelineApi, ScoredSource } from '../lib/api';
 import { SCORING_PROFILES, calculateScore, ScoringProfile } from '../types';
 
@@ -44,7 +44,6 @@ export default function Results() {
   const [selectedProfile, setSelectedProfile] = useState<string>('default');
   const [customWeights, setCustomWeights] = useState<ScoringProfile>(SCORING_PROFILES.default);
   const [isCustomMode, setIsCustomMode] = useState(false);
-  const [expandedSource, setExpandedSource] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, 'like' | 'dislike' | null>>({});
 
   const [sources, setSources] = useState<ReturnType<typeof mapSource>[]>([]);
@@ -100,7 +99,8 @@ export default function Results() {
           profile,
         ),
       }))
-      .sort((a, b) => b.currentScore - a.currentScore);
+      .sort((a, b) => b.currentScore - a.currentScore)
+    .slice(0, 20);
   }, [selectedProfile, customWeights, isCustomMode, sources]);
 
   const handleProfileChange = (profile: string) => {
@@ -321,25 +321,7 @@ export default function Results() {
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-[#e8e6e1]">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setExpandedSource(expandedSource === source.id ? null : source.id)}
-                        className="text-[#2c5f5f] hover:bg-[#2c5f5f]/5"
-                      >
-                        {expandedSource === source.id ? (
-                          <>
-                            <ChevronUp className="mr-1 h-4 w-4" />
-                            Hide Details
-                          </>
-                        ) : (
-                          <>
-                            <ChevronDown className="mr-1 h-4 w-4" />
-                            Show Details
-                          </>
-                        )}
-                      </Button>
+                    <div className="flex justify-end pt-4 border-t border-[#e8e6e1]">
                       <div className="flex gap-2">
                         <Button
                           variant={feedback[source.id] === 'like' ? 'default' : 'outline'}
@@ -359,82 +341,6 @@ export default function Results() {
                         </Button>
                       </div>
                     </div>
-
-                    <AnimatePresence>
-                      {expandedSource === source.id && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-4 pt-4 border-t border-[#e8e6e1] space-y-4"
-                        >
-                          {source.namedOfficials.length > 0 && (
-                            <div>
-                              <h5 className="text-sm mb-2">Named Officials</h5>
-                              <div className="space-y-2">
-                                {source.namedOfficials.map((official, i) => (
-                                  <div key={i} className="text-sm bg-[#f5f4f0] p-3 rounded">
-                                    <div className="mb-1">
-                                      <strong>{official.name}</strong> — {official.role}
-                                    </div>
-                                    <div className="text-xs text-[#6b6b68]">{official.context}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {source.commitments.length > 0 && (
-                            <div>
-                              <h5 className="text-sm mb-2">Commitments</h5>
-                              <div className="space-y-2">
-                                {source.commitments.map((commitment, i) => (
-                                  <div key={i} className="text-sm bg-[#f5f4f0] p-3 rounded">
-                                    <div className="mb-1">
-                                      <strong>{commitment.actor}</strong>: {commitment.commitment}
-                                    </div>
-                                    <div className="flex gap-4 text-xs text-[#6b6b68]">
-                                      {commitment.amount && <span>Amount: {commitment.amount}</span>}
-                                      {commitment.timeline && <span>Timeline: {commitment.timeline}</span>}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {source.unmetNeeds.length > 0 && (
-                            <div>
-                              <h5 className="text-sm mb-2">Unmet Needs</h5>
-                              <ul className="list-disc list-inside space-y-1 text-sm text-[#6b6b68]">
-                                {source.unmetNeeds.map((need, i) => (
-                                  <li key={i}>{need}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          <div className="grid md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-[#6b6b68]">Geographic Specificity:</span>{' '}
-                              <strong>{source.geographicSpecificity}</strong>
-                            </div>
-                            <div>
-                              <span className="text-[#6b6b68]">Language:</span>{' '}
-                              <strong>{source.sourceLanguage}</strong>
-                            </div>
-                          </div>
-
-                          {source.namedOrganizations.length > 0 && (
-                            <div>
-                              <span className="text-sm text-[#6b6b68]">Organizations: </span>
-                              <span className="text-sm">{source.namedOrganizations.join(', ')}</span>
-                            </div>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                   </div>
                 </Card>
               </motion.div>

@@ -243,7 +243,7 @@ def generate_report(
             detail=f"Pipeline is not completed yet (status: {run.status})",
         )
 
-    sources = run.result or []
+    sources = (run.result or [])[:20]
 
     sources_summary = "\n\n".join(
         f"Source {i + 1}: {s.get('title', 'Untitled')}\n"
@@ -304,7 +304,7 @@ def chat(
     if run.status != "completed":
         raise HTTPException(status_code=409, detail="Pipeline not completed")
 
-    sources = run.result or []
+    sources = (run.result or [])[:20]
     sources_summary = "\n\n".join(
         f"Source {i + 1}: {s.get('title', 'Untitled')}\n"
         f"URL: {s.get('url', '')}\n"

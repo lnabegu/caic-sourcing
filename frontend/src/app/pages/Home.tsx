@@ -4,7 +4,14 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Textarea } from '../components/ui/textarea';
-import { Search } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../components/ui/dialog';
+import { Info, Search } from 'lucide-react';
 import { motion } from 'motion/react';
 import { pipelineApi } from '../lib/api';
 
@@ -65,6 +72,59 @@ export default function Home() {
               Search and analyze sources related to specific climate events. Our pipeline extracts metadata,
               identifies decision-makers, tracks commitments, and surfaces accountability signals.
             </p>
+
+            <div className="mt-4 flex justify-center">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button className="inline-flex items-center gap-1.5 text-xs text-[#2c5f5f]/70 hover:text-[#2c5f5f] transition-colors">
+                    <Info className="h-3.5 w-3.5" />
+                    How to authenticate
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Generating an access token</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 text-sm text-[#3a3a38]">
+                    <p>
+                      The API requires a JWT bearer token. Use the interactive docs at{' '}
+                      <a
+                        href="https://caic-sourcing.onrender.com/docs"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#2c5f5f] underline underline-offset-2"
+                      >
+                        caic-sourcing.onrender.com/docs
+                      </a>{' '}
+                      to register and get one.
+                    </p>
+                    <ol className="list-decimal list-inside space-y-2 text-[#4a4a47]">
+                      <li>
+                        Open the docs and expand <strong>POST /api/auth/jwt/register</strong>.
+                      </li>
+                      <li>
+                        Click <em>Try it out</em>, fill in your email, password, and name, then
+                        click <em>Execute</em>.
+                      </li>
+                      <li>
+                        Copy the <code className="bg-[#f0efeb] px-1 py-0.5 rounded text-xs">access_token</code> from the response body.
+                      </li>
+                      <li>
+                        Open your browser console on this page and run:
+                        <pre className="mt-1.5 bg-[#f0efeb] rounded p-3 text-xs overflow-x-auto whitespace-pre-wrap break-all">
+{`localStorage.setItem('caic_access_token', 'PASTE_TOKEN_HERE')`}
+                        </pre>
+                      </li>
+                      <li>Reload the page — you're authenticated.</li>
+                    </ol>
+                    <p className="text-[#6b6b68] text-xs">
+                      Already registered? Use <strong>POST /api/auth/jwt/login</strong> instead and
+                      copy the token the same way.
+                    </p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <motion.div

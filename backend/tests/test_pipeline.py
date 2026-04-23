@@ -52,16 +52,10 @@ def test_score_sources_sorts_descending():
     assert scores == sorted(scores, reverse=True)
 
 
-def test_score_sources_respects_max_sources():
+def test_score_sources_returns_all_sources():
     chars = [_make_char(f"http://example.com/{i}") for i in range(30)]
-    result = score_sources(chars, _equal_weights(), max_sources=20)
-    assert len(result) <= 20
-
-
-def test_score_sources_default_max_is_20():
-    chars = [_make_char(f"http://example.com/{i}") for i in range(25)]
     result = score_sources(chars, _equal_weights())
-    assert len(result) <= 20
+    assert len(result) == 30
 
 
 def test_score_sources_empty_input():

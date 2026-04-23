@@ -124,14 +124,12 @@ def search_queries(
     max_results_per_query: int = 5,
 ) -> List[Dict[str, Any]]:
     """
-    Run all queries against Gensee, deduplicate by URL, return ≤20 unique results.
+    Run all queries against Gensee, deduplicate by URL, return all unique results.
     """
     seen_urls: set = set()
     unique_results: List[Dict[str, Any]] = []
 
     for q in queries:
-        if len(unique_results) >= 20:
-            break
         try:
             results = _search_gensee(q, api_key, max_results=max_results_per_query)
         except Exception as exc:
@@ -143,8 +141,6 @@ def search_queries(
             if url and url not in seen_urls:
                 seen_urls.add(url)
                 unique_results.append(r)
-                if len(unique_results) >= 20:
-                    break
 
     return unique_results
 
@@ -296,10 +292,9 @@ def characterize_all(
 def score_sources(
     characterized: List[Dict[str, Any]],
     weights: Dict[str, float],
-    max_sources: int = 20,
 ) -> List[Dict[str, Any]]:
     """
-    Compute composite scores, sort descending, return top max_sources.
+    Compute composite scores for all sources and sort descending.
 
     Each item in the returned list gains a composite_score field (0–10 scale).
     """
@@ -314,4 +309,4 @@ def score_sources(
         scored.append(item)
 
     scored.sort(key=lambda x: x["composite_score"], reverse=True)
-    return scored[:max_sources]
+    return scored

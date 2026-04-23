@@ -119,13 +119,21 @@ function parseSections(text: string): { title: string; body: string }[] {
   const lines = text.split('\n');
   const sections: { title: string; body: string }[] = [];
   let current: { title: string; lines: string[] } | null = null;
+  let inReferences = false;
 
   for (const line of lines) {
+    // Once inside a References section, treat everything as body content
+    if (inReferences) {
+      if (current) current.lines.push(line);
+      continue;
+    }
     // Match: optional ##/**, optional number+dot, then the heading text, optional colon/**
     const heading = line.match(/^(?:#{1,3}\s*|\*{1,2})?(\d+\.\s+[A-Za-z][A-Za-z0-9\s,&'/()-]+?)(?::|\*{1,2})?$/);
     if (heading && heading[1].trim().length > 3) {
       if (current) sections.push({ title: current.title, body: current.lines.join('\n').trim() });
-      current = { title: heading[1].replace(/^\d+\.\s+/, '').trim(), lines: [] };
+      const title = heading[1].replace(/^\d+\.\s+/, '').trim();
+      if (/^references$/i.test(title)) inReferences = true;
+      current = { title, lines: [] };
     } else if (current) {
       current.lines.push(line);
     }
