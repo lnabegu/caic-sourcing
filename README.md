@@ -143,7 +143,7 @@ caic-sourcing/
 
 <img width="7837" height="8192" alt="Task Pipeline for Query-2026-04-29-122154" src="https://github.com/user-attachments/assets/107cfaf3-d980-4892-b2a7-ec2a89ec3975" />
 
---
+---
 
 ## Roadmap
 
