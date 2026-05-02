@@ -83,7 +83,7 @@ Initialize the DB tables if you haven't already:
 curl -X POST http://localhost:8000/init-db
 ```
 
-Then open `http://localhost:5173`, register an account, and you're in.
+Then open `http://localhost:5173`.
 
 ## API docs
 

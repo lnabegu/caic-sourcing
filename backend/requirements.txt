@@ -49,3 +49,4 @@ apify-client==1.9.4
 # Source discovery module
 anthropic>=0.40.0
 trafilatura>=1.8.0
+slowapi==0.1.9

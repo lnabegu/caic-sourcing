@@ -3,16 +3,14 @@ FastAPI router for source discovery endpoints.
 Mount at /api/source-discovery via:
     app.include_router(source_discovery_router, prefix="/api/source-discovery")
 """
-from __future__ import annotations
-
 import logging
 import uuid
 from typing import Any, Dict
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from ..core.auth import get_current_active_user
+from ..core.limiter import limiter
 from ..database import get_db
 from ..models.base import SessionLocal
 from .config import default_scoring_config
@@ -59,11 +57,12 @@ def _resolve_weights(scoring) -> Dict[str, float]:
     response_model=TaskCreatedResponse,
     status_code=status.HTTP_202_ACCEPTED,
 )
+@limiter.limit("2/minute")
 async def run_pipeline(
+    request: Request,
     body: PipelineRunRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Create a pipeline run and kick it off in the background."""
     try:
@@ -99,7 +98,6 @@ async def run_pipeline(
 async def get_pipeline_status(
     task_id: str,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Return current status and progress of a pipeline run."""
     run = db.query(SDPipelineRun).filter(SDPipelineRun.task_id == task_id).first()
@@ -117,7 +115,6 @@ async def get_pipeline_status(
 async def get_pipeline_results(
     task_id: str,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Return scored sources for a completed pipeline run (409 if not complete)."""
     run = db.query(SDPipelineRun).filter(SDPipelineRun.task_id == task_id).first()
@@ -142,7 +139,6 @@ async def rate_source(
     task_id: str,
     body: SourceRatingRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Store a user rating for a source with a snapshot of weights and scores."""
     run = db.query(SDPipelineRun).filter(SDPipelineRun.task_id == task_id).first()
@@ -224,10 +220,11 @@ Return the report as plain text with section headers."""
 
 
 @router.post("/pipeline/{task_id}/report", response_model=ReportResponse)
+@limiter.limit("10/minute")
 def generate_report(
+    request: Request,
     task_id: str,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Generate an AI report synthesizing all sources for a completed pipeline run."""
     import os
@@ -287,11 +284,12 @@ Answer questions about this event using only the information in these sources. B
 
 
 @router.post("/pipeline/{task_id}/chat", response_model=ChatResponse)
+@limiter.limit("10/minute")
 def chat(
+    request: Request,
     task_id: str,
     body: ChatRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Answer a question about a completed pipeline run using Claude."""
     import os
@@ -333,9 +331,7 @@ def chat(
 
 
 @router.get("/scoring/profiles", response_model=ProfilesResponse)
-async def list_scoring_profiles(
-    current_user=Depends(get_current_active_user),
-):
+async def list_scoring_profiles():
     """Return all available scoring profiles."""
     return ProfilesResponse(profiles=default_scoring_config.list_profiles())
 
@@ -345,7 +341,6 @@ async def rescore_pipeline(
     task_id: str,
     body: RescoreRequest,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_active_user),
 ):
     """Re-rank completed pipeline results with new weights (no re-run)."""
     run = db.query(SDPipelineRun).filter(SDPipelineRun.task_id == task_id).first()
